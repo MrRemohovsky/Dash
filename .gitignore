@@ -31,5 +31,3 @@ tox/
 *.pot
 *.py,cover
 *.sqlite3
-migrations/
-*.db
