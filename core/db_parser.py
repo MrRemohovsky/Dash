@@ -1,8 +1,8 @@
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from models import *
-from config import Config
-from utils import bulk_create
+from core.config import Config
+from core.utils import bulk_create
 
 
 MonitoringBase = None
@@ -66,28 +66,3 @@ def sync_data(app):
                     )
             if new_charts:
                 bulk_create(new_charts)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,1 +1,2 @@
 #flask, flasksqlalchemy, psycopg2, flask-migrate
+#pip install dash plotly pandas
