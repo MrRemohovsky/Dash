@@ -1,8 +1,6 @@
-import os
-from dash import Dash, html, dcc, callback, Output, Input
+from dash import html, dcc, Output, Input
 from services.chart_service import ChartService
 from models import Factory, Device, Chart
-
 
 class DashboardApp:
     def __init__(self, dash_app):
@@ -10,46 +8,37 @@ class DashboardApp:
         self._setup_layout()
         self._register_callbacks()
 
-    def _load_navbar_content(self):
-        navbar_path = os.path.join(os.getcwd(), "templates/navbar.html")
-        with open(navbar_path, 'r', encoding='utf-8') as f:
-            return f.read()
-
     def _setup_layout(self):
-        navbar_content = self._load_navbar_content()
         with self.dash_app.server.app_context():
             factories = Factory.query.all()
 
         self.dash_app.layout = html.Div([
-            #dcc.Markdown(navbar_content, dangerously_allow_html=True),
-            html.Div([
-                html.H1("Charts", className="text-center"),
-                html.Label("Select Factory:", className="form-label"),
-                dcc.Dropdown(
-                    id='factory-selector',
-                    options=[{'label': factory.title, 'value': factory.id} for factory in factories],
-                    value=None,
-                    placeholder="Select a factory",
-                    className="mb-3"
-                ),
-                html.Label("Select Device:", className="form-label"),
-                dcc.Dropdown(
-                    id='device-selector',
-                    options=[],
-                    value=None,
-                    placeholder="Select a device",
-                    className="mb-3"
-                ),
-                dcc.DatePickerRange(
-                    id='date-picker-range',
-                    start_date="2025-03-20",
-                    end_date="2025-03-22",
-                    display_format='YYYY-MM-DD',
-                    className="mb-3"
-                ),
-                html.Div(id='charts-container')
-            ], className="container")
-        ])
+            html.H1("Charts", className="text-center"),
+            html.Label("Select Factory:", className="form-label"),
+            dcc.Dropdown(
+                id='factory-selector',
+                options=[{'label': factory.title, 'value': factory.id} for factory in factories],
+                value=None,
+                placeholder="Select a factory",
+                className="mb-3"
+            ),
+            html.Label("Select Device:", className="form-label"),
+            dcc.Dropdown(
+                id='device-selector',
+                options=[],
+                value=None,
+                placeholder="Select a device",
+                className="mb-3"
+            ),
+            dcc.DatePickerRange(
+                id='date-picker-range',
+                start_date="2025-03-20",
+                end_date="2025-03-22",
+                display_format='YYYY-MM-DD',
+                className="mb-3"
+            ),
+            html.Div(id='charts-container', className="row")
+        ], className="container-fluid")
 
     def _get_device_options(self, factory_id):
         if not factory_id:
@@ -70,7 +59,12 @@ class DashboardApp:
                 filtered_time_series = ChartService.filter_chart(chart.time_series, start_date, end_date)
                 if filtered_time_series:
                     fig = ChartService.build_chart(filtered_time_series, chart.title)
-                    chart_elements.append(dcc.Graph(figure=fig, className="mt-3"))
+                    chart_elements.append(
+                        html.Div(
+                            dcc.Graph(figure=fig, style={'height': '300px'}),
+                            className="col-md-6 mb-2"
+                        )
+                    )
         return chart_elements if chart_elements else [html.P("No data for the selected filters.", className="text-muted")]
 
     def _register_callbacks(self):
@@ -90,7 +84,6 @@ class DashboardApp:
         )
         def update_charts(factory_id, device_id, start_date, end_date):
             return self._get_chart_elements(factory_id, device_id, start_date, end_date)
-
 
 def init_dashboard(dash_app):
     return DashboardApp(dash_app)

@@ -20,11 +20,16 @@ init_dashboard(dash_app)
 @app.route('/')
 def index():
     return render_template('base.html')
-
+@app.route('/dash')
+def dash_page():
+    return render_template('dash_page.html')
 @app.route('/s')
 def s():
     sync_data(app)
     return 'РАБОТА С БД'
+@app.route('/dashboard/')
+def render_dash():
+    return dash_app.index()
 
 if __name__ == "__main__":
     app.run(debug=True)
