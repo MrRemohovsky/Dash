@@ -1,74 +1,96 @@
 import os
-from dash import html, dcc, callback, Output, Input
+from dash import Dash, html, dcc, callback, Output, Input
 from services.chart_service import ChartService
 from models import Factory, Device, Chart
 
-def init_dashboard(dash_app):
-    navbar_path = os.path.join(dash_app.server.static_folder, 'navbar.html')
-    with open(navbar_path, 'r', encoding='utf-8') as f:
-        navbar_content = f.read()
-    with dash_app.server.app_context():
-        charts = Chart.query.all()
-        factories = Factory.query.all()
-        devices = Device.query.all()
 
-    dash_app.layout = html.Div([
-        dcc.Markdown(navbar_content, dangerously_allow_html=True),
-        html.H1("Dashboard with Charts"),
-        # Селектор завода
-        html.Label("Select Factory:"),
-        dcc.Dropdown(
-            id='factory-selector',
-            options=[{'label': factory.title, 'value': factory.id} for factory in factories],
-            value=None,
-            placeholder="Select a factory"
-        ),
-        # Селектор устройства
-        html.Label("Select Device:"),
-        dcc.Dropdown(
-            id='device-selector',
-            options=[],
-            value=None,
-            placeholder="Select a device"
-        ),
-        # Фильтр по дате
-        dcc.DatePickerRange(
-            id='date-picker-range',
-            start_date="2025-03-20",
-            end_date="2025-03-22",
-            display_format='YYYY-MM-DD'
-        ),
-        html.Div(id='charts-container')
-    ])
+class DashboardApp:
+    def __init__(self, dash_app):
+        self.dash_app = dash_app
+        self._setup_layout()
+        self._register_callbacks()
 
-    # Callback для обновления списка устройств
-    @callback(
-        Output('device-selector', 'options'),
-        Input('factory-selector', 'value')
-    )
-    def update_device_selector(factory_id):
+    def _load_navbar_content(self):
+        navbar_path = os.path.join(os.getcwd(), "templates/navbar.html")
+        with open(navbar_path, 'r', encoding='utf-8') as f:
+            return f.read()
+
+    def _setup_layout(self):
+        navbar_content = self._load_navbar_content()
+        with self.dash_app.server.app_context():
+            factories = Factory.query.all()
+
+        self.dash_app.layout = html.Div([
+            #dcc.Markdown(navbar_content, dangerously_allow_html=True),
+            html.Div([
+                html.H1("Charts", className="text-center"),
+                html.Label("Select Factory:", className="form-label"),
+                dcc.Dropdown(
+                    id='factory-selector',
+                    options=[{'label': factory.title, 'value': factory.id} for factory in factories],
+                    value=None,
+                    placeholder="Select a factory",
+                    className="mb-3"
+                ),
+                html.Label("Select Device:", className="form-label"),
+                dcc.Dropdown(
+                    id='device-selector',
+                    options=[],
+                    value=None,
+                    placeholder="Select a device",
+                    className="mb-3"
+                ),
+                dcc.DatePickerRange(
+                    id='date-picker-range',
+                    start_date="2025-03-20",
+                    end_date="2025-03-22",
+                    display_format='YYYY-MM-DD',
+                    className="mb-3"
+                ),
+                html.Div(id='charts-container')
+            ], className="container")
+        ])
+
+    def _get_device_options(self, factory_id):
         if not factory_id:
             return []
-        with dash_app.server.app_context():
+        with self.dash_app.server.app_context():
             devices = Device.query.filter_by(factory_id=factory_id).all()
             return [{'label': device.title, 'value': device.id} for device in devices]
 
-    @callback(
-        Output('charts-container', 'children'),
-        Input('factory-selector', 'value'),
-        Input('device-selector', 'value'),
-        Input('date-picker-range', 'start_date'),
-        Input('date-picker-range', 'end_date')
-    )
-    def update_charts(factory_id, device_id, start_date, end_date):
+    def _get_chart_elements(self, factory_id, device_id, start_date, end_date):
         chart_elements = []
-        with dash_app.server.app_context():
-            filtered_charts = Chart.query.join(Device).filter(Chart.device_id==device_id).filter(Device.factory_id==factory_id).all() \
-            if factory_id and device_id else []
+        with self.dash_app.server.app_context():
+            filtered_charts = Chart.query.join(Device).filter(
+                Chart.device_id == device_id,
+                Device.factory_id == factory_id
+            ).all() if factory_id and device_id else []
 
             for chart in filtered_charts:
                 filtered_time_series = ChartService.filter_chart(chart.time_series, start_date, end_date)
                 if filtered_time_series:
                     fig = ChartService.build_chart(filtered_time_series, chart.title)
-                    chart_elements.append(dcc.Graph(figure=fig))
-        return chart_elements if chart_elements else [html.P("No data for the selected filters.")]
+                    chart_elements.append(dcc.Graph(figure=fig, className="mt-3"))
+        return chart_elements if chart_elements else [html.P("No data for the selected filters.", className="text-muted")]
+
+    def _register_callbacks(self):
+        @self.dash_app.callback(
+            Output('device-selector', 'options'),
+            Input('factory-selector', 'value')
+        )
+        def update_device_selector(factory_id):
+            return self._get_device_options(factory_id)
+
+        @self.dash_app.callback(
+            Output('charts-container', 'children'),
+            Input('factory-selector', 'value'),
+            Input('device-selector', 'value'),
+            Input('date-picker-range', 'start_date'),
+            Input('date-picker-range', 'end_date')
+        )
+        def update_charts(factory_id, device_id, start_date, end_date):
+            return self._get_chart_elements(factory_id, device_id, start_date, end_date)
+
+
+def init_dashboard(dash_app):
+    return DashboardApp(dash_app)
