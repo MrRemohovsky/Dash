@@ -13,7 +13,8 @@ init_db(app)
 migrate = Migrate(app, db)
 
 dash_app = Dash(__name__, server=app, url_base_pathname='/dashboard/', external_stylesheets=[
-    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css",
+    "/templates/css/dash_styles.css",
 ])
 
 init_dashboard(dash_app)

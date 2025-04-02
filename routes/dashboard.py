@@ -13,32 +13,40 @@ class DashboardApp:
             factories = Factory.query.all()
 
         self.dash_app.layout = html.Div([
-            html.H1("Charts", className="text-center"),
-            html.Label("Select Factory:", className="form-label"),
-            dcc.Dropdown(
-                id='factory-selector',
-                options=[{'label': factory.title, 'value': factory.id} for factory in factories],
-                value=None,
-                placeholder="Select a factory",
-                className="mb-3"
-            ),
-            html.Label("Select Device:", className="form-label"),
-            dcc.Dropdown(
-                id='device-selector',
-                options=[],
-                value=None,
-                placeholder="Select a device",
-                className="mb-3"
-            ),
-            dcc.DatePickerRange(
-                id='date-picker-range',
-                start_date="2025-03-20",
-                end_date="2025-03-22",
-                display_format='YYYY-MM-DD',
-                className="mb-3"
-            ),
-            html.Div(id='charts-container', className="row")
-        ], className="container-fluid")
+            html.Div([
+                html.Div([
+                    html.Label("Завод:", className="form-label selector-label"),
+                    dcc.Dropdown(
+                        id='factory-selector',
+                        options=[{'label': factory.title, 'value': factory.id} for factory in factories],
+                        value=None,
+                        placeholder="Выберите завод",
+                        className="selector"
+                    ),
+                ], className="selector-wrapper"),
+                html.Div([
+                    html.Label("Устройство:", className="form-label selector-label"),
+                    dcc.Dropdown(
+                        id='device-selector',
+                        options=[],
+                        value=None,
+                        placeholder="Выберите устройство",
+                        className="selector"
+                    ),
+                ], className="selector-wrapper"),
+                html.Div([
+                    html.Label("Диапазон дат:", className="form-label selector-label date-label"),
+                    dcc.DatePickerRange(
+                        id='date-picker-range',
+                        start_date="2025-03-20",
+                        end_date="2025-03-22",
+                        display_format='YYYY-MM-DD',
+                        className="selector date-picker"
+                    ),
+                ], className="selector-wrapper"),
+            ], className="selector-container"),
+            html.Div(id='charts-container', className="row charts-container")
+        ], className="container-fluid dash-background")
 
     def _get_device_options(self, factory_id):
         if not factory_id:
@@ -65,7 +73,7 @@ class DashboardApp:
                             className="col-md-6 mb-2"
                         )
                     )
-        return chart_elements if chart_elements else [html.P("No data for the selected filters.", className="text-muted")]
+        return chart_elements if chart_elements else None
 
     def _register_callbacks(self):
         @self.dash_app.callback(

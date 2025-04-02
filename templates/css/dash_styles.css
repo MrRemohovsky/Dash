@@ -1,0 +1,156 @@
+.dash-background {
+    background: linear-gradient(135deg, rgba(20, 20, 35, 1) 0%, rgba(40, 40, 60, 1) 100%);
+    min-height: 100vh;
+    color: #ffffff;
+    padding: 2rem;
+    font-family: 'Arial', sans-serif;
+}
+
+.selector-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    background: rgba(30, 30, 47, 0.9);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.selector-wrapper {
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.selector {
+    width: 150px;
+    font-size: 12px;
+    background-color: rgba(60, 60, 90, 0.9);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.selector.date-picker {
+    width: 250px;
+    display: inline-flex;
+    align-items: center;
+    top: 14px;
+}
+
+.date-label {
+    position: relative;
+    top: -19px;
+    left: 190px;
+}
+
+.selector-label {
+    color: #00d4ff;
+    font-size: 12px;
+    margin-right: 10px;
+    line-height: 1;
+    margin-bottom: 0;
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+}
+
+.charts-container {
+    margin-top: 100px;
+    padding: 20px;
+}
+
+.Select-control {
+    background-color: rgba(60, 60, 90, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.Select-placeholder,
+.Select-value {
+    color: #00d4ff !important;
+}
+
+.Select-input > input {
+    color: #00d4ff !important;
+}
+
+.Select-menu-outer {
+    background-color: rgba(60, 60, 90, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.Select-option {
+    color: #ffffff !important;
+}
+
+.Select-option.is-focused {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.DateRangePickerInput {
+    display: inline-flex !important;
+    align-items: center !important;
+    background-color: rgba(60, 60, 90, 0.9) !important;
+    border: 1px solid rgba(255, 255,255, 0.2) !important;
+}
+
+.DateInput {
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+}
+
+.DateInput_input {
+    font-size: 12px !important;
+    color: #00d4ff !important;
+    background-color: transparent !important;
+    border: none !important;
+    line-height: 1;
+    height: 30px;
+    padding: 0 5px;
+}
+
+.DateInput_input::placeholder {
+    color: #00d4ff !important;
+}
+
+.DateRangePickerInput {
+    display: inline-flex !important;
+    align-items: center !important;
+    background-color: rgba(60, 60, 90, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    height: 30px;
+}
+
+.DateRangePicker_picker {
+    background-color: rgba(60, 60, 90, 0.9) !important;
+}
+
+.CalendarDay {
+    color: #ffffff !important;
+}
+
+.CalendarDay__selected {
+    background: #00d4ff !important;
+    color: #ffffff !important;
+}
+
+.Select-value-label {
+    color: #00d4ff !important;
+}
+
+.Select-value.is-selected .Select-value-label {
+    color: #00d4ff !important;
+}
+
+.Select-option.is-selected {
+    background-color: rgba(0, 212, 255, 0.2) !important;
+    color: #00d4ff !important;
+}
+
+.Select-option:hover {
+    background-color: rgba(0, 212, 255, 0.1) !important;
+    color: #00d4ff !important;
+}
