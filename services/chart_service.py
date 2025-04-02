@@ -4,7 +4,6 @@ from datetime import datetime
 
 
 class ChartService:
-
     @staticmethod
     def build_chart(time_series, title):
         df = pd.DataFrame(time_series)
@@ -29,3 +28,9 @@ class ChartService:
             if start <= datetime.fromisoformat(record["timestamp"].replace("Z", "+00:00")) <= end
         ]
         return filtered
+
+
+
+class ChartTypeSelector:
+    def __init__(self):
+        pass

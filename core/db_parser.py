@@ -1,6 +1,6 @@
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
-from models import *
+from models import db, Factory, Equipment, Chart
 from core.config import Config
 from core.utils import bulk_create
 
@@ -42,12 +42,13 @@ def sync_data(app):
 
             #Работа с устройствами-------------------------------------------------------
             equipments = monitoring_session.query(Equipments).all()
-            new_device = []
+            new_equipments = []
             for equipment in equipments:
-                if not Device.query.filter_by(id=equipment.equipment_id, factory_id=equipment.workshop_id).first():
-                    new_device.append(Device(id=equipment.equipment_id, title=equipment.equipment_name, factory_id=equipment.workshop_id))
-            if new_device:
-                bulk_create(new_device)
+                if not Equipment.query.filter_by(id=equipment.equipment_id, factory_id=equipment.workshop_id).first():
+                    new_equipments.append(Equipment(id=equipment.equipment_id, title=equipment.equipment_name,
+                                                    factory_id=equipment.workshop_id, position=equipment.equipment_position,))
+            if new_equipments:
+                bulk_create(new_equipments)
 
             #Работа с графиками-------------------------------------------------------
             sensors = monitoring_session.query(Sensors).all()
@@ -59,10 +60,11 @@ def sync_data(app):
                     for data in sensor_data
                 ]
 
-                if not Chart.query.filter_by(id=sensor.sensor_id, device_id=sensor.equipment_id).first():
+                if not Chart.query.filter_by(id=sensor.sensor_id, equipment_id=sensor.equipment_id).first():
                     new_charts.append(
                         Chart(id=sensor.sensor_id, title=sensor.variables.variable_name,
-                              time_series=time_series, device_id=sensor.equipment_id)
+                              time_series=time_series, equipment_id=sensor.equipment_id,
+                              sensor_type=sensor.type, unit=sensor.unit)
                     )
             if new_charts:
                 bulk_create(new_charts)

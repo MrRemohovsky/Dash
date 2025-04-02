@@ -1,6 +1,6 @@
 from dash import html, dcc, Output, Input
 from services.chart_service import ChartService
-from models import Factory, Device, Chart
+from models import Factory, Equipment, Chart
 
 class DashboardApp:
     def __init__(self, dash_app):
@@ -48,22 +48,22 @@ class DashboardApp:
             html.Div(id='charts-container', className="row charts-container")
         ], className="container-fluid dash-background")
 
-    def _get_device_options(self, factory_id):
+    def _get_equipment_options(self, factory_id):
         if not factory_id:
             return []
         with self.dash_app.server.app_context():
-            devices = Device.query.filter_by(factory_id=factory_id).all()
-            return [{'label': device.title, 'value': device.id} for device in devices]
+            equipments = Equipment.query.filter_by(factory_id=factory_id).all()
+            return [{'label': equipment.title, 'value': equipment.id} for equipment in equipments]
 
-    def _get_chart_elements(self, factory_id, device_id, start_date, end_date):
+    def _get_chart_elements(self, factory_id, equipment_id, start_date, end_date):
         chart_elements = []
         with self.dash_app.server.app_context():
-            filtered_charts = Chart.query.join(Device).filter(
-                Chart.device_id == device_id,
-                Device.factory_id == factory_id
-            ).all() if factory_id and device_id else []
+            charts = Chart.query.join(Equipment).filter(
+                Chart.equipment_id == equipment_id,
+                Equipment.factory_id == factory_id
+            ).all() if factory_id and equipment_id else []
 
-            for chart in filtered_charts:
+            for chart in charts:
                 filtered_time_series = ChartService.filter_chart(chart.time_series, start_date, end_date)
                 if filtered_time_series:
                     fig = ChartService.build_chart(filtered_time_series, chart.title)
@@ -80,8 +80,8 @@ class DashboardApp:
             Output('device-selector', 'options'),
             Input('factory-selector', 'value')
         )
-        def update_device_selector(factory_id):
-            return self._get_device_options(factory_id)
+        def update_equipment_selector(factory_id):
+            return self._get_equipment_options(factory_id)
 
         @self.dash_app.callback(
             Output('charts-container', 'children'),
@@ -90,8 +90,8 @@ class DashboardApp:
             Input('date-picker-range', 'start_date'),
             Input('date-picker-range', 'end_date')
         )
-        def update_charts(factory_id, device_id, start_date, end_date):
-            return self._get_chart_elements(factory_id, device_id, start_date, end_date)
+        def update_charts(factory_id, equipment_id, start_date, end_date):
+            return self._get_chart_elements(factory_id, equipment_id, start_date, end_date)
 
 def init_dashboard(dash_app):
     return DashboardApp(dash_app)
