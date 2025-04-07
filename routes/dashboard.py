@@ -66,7 +66,7 @@ class DashboardApp:
             for chart in charts:
                 filtered_time_series = ChartService.filter_chart(chart.time_series, start_date, end_date)
                 if filtered_time_series:
-                    fig = ChartService.build_chart(filtered_time_series, chart.title)
+                    fig = ChartService.build_chart(filtered_time_series, chart.title, chart.sensor_type, chart.unit)
                     chart_elements.append(
                         html.Div(
                             dcc.Graph(figure=fig, style={'height': '300px'}),
