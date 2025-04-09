@@ -5,20 +5,19 @@ from models import Factory, Equipment, Chart
 class DashboardApp:
     def __init__(self, dash_app):
         self.dash_app = dash_app
+        with self.dash_app.server.app_context():
+            self.factories = Factory.query.all()
         self._setup_layout()
         self._register_callbacks()
 
     def _setup_layout(self):
-        with self.dash_app.server.app_context():
-            factories = Factory.query.all()
-
         self.dash_app.layout = html.Div([
             html.Div([
                 html.Div([
                     html.Label("Завод:", className="form-label selector-label"),
                     dcc.Dropdown(
                         id='factory-selector',
-                        options=[{'label': factory.title, 'value': factory.id} for factory in factories],
+                        options=[{'label': factory.title, 'value': factory.id} for factory in  self.factories],
                         value=None,
                         placeholder="Выберите завод",
                         className="selector"
@@ -56,6 +55,8 @@ class DashboardApp:
             return [{'label': equipment.title, 'value': equipment.id} for equipment in equipments]
 
     def _get_chart_elements(self, factory_id, equipment_id, start_date, end_date):
+        if not factory_id or not equipment_id or not start_date or not end_date:
+            return [html.P("Выберите завод, устройство и диапазон дат для отображения графиков")]
         chart_elements = []
         with self.dash_app.server.app_context():
             charts = Chart.query.join(Equipment).filter(

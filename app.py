@@ -5,12 +5,17 @@ from flask_migrate import Migrate
 from routes.dashboard import init_dashboard
 from core.config import Config
 from core.db_parser import init_db, db, sync_data
+from flask_security import Security, SQLAlchemyUserDatastore
+from models import User, Role
 
 app = Flask(__name__, static_folder=os.path.join(os.getcwd(), 'templates'))
 app.config.from_object(Config)
 init_db(app)
 
 migrate = Migrate(app, db)
+
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+security = Security(app, user_datastore)
 
 dash_app = Dash(__name__, server=app, url_base_pathname='/dashboard/', external_stylesheets=[
     "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css",
