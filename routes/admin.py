@@ -1,5 +1,4 @@
 import uuid
-
 from flask import Blueprint, request, render_template, flash, redirect, url_for, jsonify, get_flashed_messages
 from flask_security import hash_password
 from core.utils import login_required
@@ -12,7 +11,7 @@ admin = Blueprint('admin', __name__)
 @login_required
 def get_all_users():
     page = request.args.get('page', 1, type=int)
-    pagination = User.query.paginate(page=page, per_page=10)
+    pagination = User.query.filter_by(active=True).paginate(page=page, per_page=10)
     return render_template('admin_panel.html', pagination=pagination)
 
 @admin.route('/admin_panel/create', methods=['POST'])
@@ -54,3 +53,19 @@ def create_user():
         'success': False,
         'messages': get_flashed_messages(with_categories=True)
     })
+
+
+@admin.route('/admin_panel/deactivate/<string:user_id>', methods=['POST'])
+@login_required
+def deactivate_user(user_id):
+    user = User.query.filter_by(id=user_id).first()
+
+    if not user:
+        return jsonify(success=False, message='Пользователь не найден.')
+
+    if any(role.name.lower() == 'admin' for role in user.roles):
+        return jsonify(success=False, message='Нельзя деактивировать администратора.')
+
+    user.active = False
+    db.session.commit()
+    return jsonify(success=True)

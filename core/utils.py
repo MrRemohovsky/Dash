@@ -11,7 +11,7 @@ def login_required(view_func):
     @wraps(view_func)
     def decorated_view(*args, **kwargs):
         if not current_user.is_authenticated:
-            flash('Вы не авторизованы!', 'danger')
+            flash('Отказано в доступе!', 'danger')
             return redirect(url_for('session.login'))
         return view_func(*args, **kwargs)
     return decorated_view
