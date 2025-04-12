@@ -1,15 +1,18 @@
 from dash import html, dcc, Output, Input
+from core.utils import login_required
 from services.chart_service import ChartService
 from models import Factory, Equipment, Chart
 from flask import render_template, Blueprint
 
 dashboard = Blueprint('dashboard', __name__)
 
-@dashboard.route('/dash')
+@dashboard.route('/charts')
+@login_required
 def dash_page():
     return render_template('dash_page.html')
 
 @dashboard.route('/dashboard/')
+@login_required
 def render_dash():
     from app import dash_app
 
