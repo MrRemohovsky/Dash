@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Вход - DashVision{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4 col-sm-8 col-lg-3">
+        <h2 class="text-center mb-4">Вход</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('session.login') }}">
+            <div class="mb-3">
+                <label for="email" class="form-label">Почта</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Введите email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Пароль</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Введите пароль" required>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Войти</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus {
+        background-color: rgba(255, 255, 255, 0.15);
+        border-color: #00d4ff;
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        color: #ffffff;
+    }
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+    .form-label {
+        color: #ffffff;
+        font-weight: 400;
+        font-size: 0.95rem;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff, #00d4ff);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0056b3, #00aaff);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+    }
+    .alert {
+        color: #ffffff;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .alert-success {
+        background: rgba(40, 167, 69, 0.8);
+        border-color: rgba(40, 167, 69, 0.9);
+    }
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.8);
+        border-color: rgba(220, 53, 69, 0.9);
+    }
+    h2 {
+        color: #ffffff;
+        font-weight: 600;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .col-md-4 {
+        background: rgba(30, 30, 47, 0.9);
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+</style>
+{% endblock %}

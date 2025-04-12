@@ -1,3 +1,6 @@
+import uuid
+
+from flask_security import hash_password
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from models import db, Factory, Equipment, Chart
@@ -14,8 +17,34 @@ def init_db(app):
     }
     db.init_app(app)
 
+def create_admin(app):
+    from app import user_datastore
 
-def sync_data(app):
+    with app.app_context():
+        admin_role = user_datastore.find_role("admin")
+        if not admin_role:
+            admin_role = user_datastore.create_role(
+                id=str(uuid.uuid4())[:4],
+                name="admin",
+                description="Администратор системы"
+            )
+            db.session.commit()
+
+        admin_user = user_datastore.find_user(email="admin@mail.ru")
+        if not admin_user:
+            user_datastore.create_user(
+                id=str(uuid.uuid4())[:4],
+                first_name="Аршанинов",
+                last_name="Андрей",
+                patronym="Вадимович",
+                email="admin@mail.ru",
+                password=hash_password("admin1234"),
+                active=True,
+                roles=[admin_role]
+            )
+            db.session.commit()
+
+def load_data(app):
     global MonitoringBase
     with app.app_context():
         if MonitoringBase is None:
@@ -68,3 +97,4 @@ def sync_data(app):
                     )
             if new_charts:
                 bulk_create(new_charts)
+            create_admin(app)

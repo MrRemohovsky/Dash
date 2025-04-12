@@ -1,6 +1,19 @@
 from dash import html, dcc, Output, Input
 from services.chart_service import ChartService
 from models import Factory, Equipment, Chart
+from flask import render_template, Blueprint
+
+dashboard = Blueprint('dashboard', __name__)
+
+@dashboard.route('/dash')
+def dash_page():
+    return render_template('dash_page.html')
+
+@dashboard.route('/dashboard/')
+def render_dash():
+    from app import dash_app
+
+    return dash_app.index()
 
 class DashboardApp:
     def __init__(self, dash_app):
