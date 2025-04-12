@@ -26,11 +26,44 @@
                 <input type="password" class="form-control" id="password" name="password" placeholder="Введите пароль" required>
             </div>
             <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Войти</button>
+                <button type="submit" class="btn btn-primary"  id="submitButton">Войти</button>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+    const EMAIL_REGEX = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const submitButton = document.getElementById('submitButton');
+
+    const emailError = document.createElement('div');
+    emailError.classList.add('error-message');
+
+    const passwordError = document.createElement('div');
+    passwordError.classList.add('error-message');
+
+    emailInput.parentNode.insertBefore(emailError, emailInput.nextSibling);
+    passwordInput.parentNode.insertBefore(passwordError, passwordInput.nextSibling);
+
+    function validateForm() {
+        const isEmailValid = EMAIL_REGEX.test(emailInput.value.trim());
+        const isPasswordValid = passwordInput.value.trim().length >= 8;
+
+        emailError.textContent = isEmailValid ? '' : 'Введите корректный email';
+        passwordError.textContent = isPasswordValid ? '' : 'Пароль должен быть не менее 8 символов';
+
+        const isFormValid = isEmailValid && isPasswordValid;
+        submitButton.disabled = !isFormValid;
+    }
+
+    emailInput.addEventListener('input', validateForm);
+    passwordInput.addEventListener('input', validateForm);
+
+    validateForm();
+</script>
 
 <style>
     .form-control {
@@ -94,6 +127,11 @@
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
+    }
+    .error-message {
+        color: red;
+        font-size: 0.9em;
+        margin-top: 4px;
     }
 </style>
 {% endblock %}

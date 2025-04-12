@@ -34,8 +34,8 @@ def create_admin(app):
         if not admin_user:
             user_datastore.create_user(
                 id=str(uuid.uuid4())[:4],
-                first_name="Аршанинов",
-                last_name="Андрей",
+                last_name="Аршанинов",
+                first_name="Андрей",
                 patronym="Вадимович",
                 email="admin@mail.ru",
                 password=hash_password("admin1234"),

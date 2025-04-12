@@ -2,12 +2,13 @@ import os
 from dash import Dash
 from flask import Flask
 from flask_migrate import Migrate
+from routes.admin import admin
+from routes.session import session
 from routes.dashboard import init_dashboard, dashboard
 from core.config import Config
 from core.db_parser import init_db, db
 from flask_security import Security, SQLAlchemyUserDatastore
 from models import User, Role
-from routes.session import session
 
 app = Flask(__name__, static_folder=os.path.join(os.getcwd(), 'templates'))
 app.config.from_object(Config)
@@ -26,6 +27,6 @@ dash_app = Dash(__name__, server=app, url_base_pathname='/dashboard/', external_
 init_dashboard(dash_app)
 app.register_blueprint(session)
 app.register_blueprint(dashboard)
-
+app.register_blueprint(admin)
 if __name__ == "__main__":
     app.run(debug=True)

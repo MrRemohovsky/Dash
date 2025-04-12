@@ -23,7 +23,7 @@ def load():
 @session.route('/login', methods=['GET', 'POST'])
 def login():
     from app import user_datastore
-
+    print('1111111111111111')
     if current_user.is_authenticated:
         return redirect('/charts')
 
