@@ -36,9 +36,9 @@ document.getElementById('confirmDeactivateBtn').addEventListener('click', async 
     const html = await (await fetch("{{ url_for('admin.get_all_users') }}")).text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
-    const newList = doc.querySelector(".list-group");
-    const oldList = document.querySelector(".list-group");
-    if (newList && oldList) oldList.replaceWith(newList);
+    const newTable = doc.querySelector("#usersTable");
+    const oldTable = document.querySelector("#usersTable");
+    if (newTable && oldTable) oldTable.replaceWith(newTable);
 
     bootstrap.Modal.getInstance(document.getElementById('confirmDeactivateModal')).hide();
 });
@@ -79,25 +79,12 @@ document.querySelector("#createUserModal form").addEventListener("submit", async
         const html = await (await fetch("{{ url_for('admin.get_all_users') }}")).text();
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
-        const newList = doc.querySelector(".list-group");
-        const oldList = document.querySelector(".list-group");
-        if (newList && oldList) oldList.replaceWith(newList);
+        const newTable = doc.querySelector("#usersTable");
+        const oldTable = document.querySelector("#usersTable");
+        if (newTable && oldTable) oldTable.replaceWith(newTable);
     }
 });
 
-function openEditModal(user) {
-    document.getElementById('edit_user_id').value = user.id;
-    document.getElementById('edit_first_name').value = user.first_name;
-    document.getElementById('edit_last_name').value = user.last_name;
-    document.getElementById('edit_patronym').value = user.patronym || '';
-    document.getElementById('edit_email').value = user.email;
-
-    const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
-    modal.show();
-}
-</script>
-
-<script>
 async function openEditModal(button) {
     const userId = button.getAttribute("data-user-id");
 
@@ -113,6 +100,7 @@ async function openEditModal(button) {
     const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
     modal.show();
 }
+
 document.getElementById("editUserForm").addEventListener("submit", async function (e) {
     e.preventDefault();
     if (!validateEditForm()) return;
@@ -145,13 +133,14 @@ document.getElementById("editUserForm").addEventListener("submit", async functio
         const html = await (await fetch("{{ url_for('admin.get_all_users') }}")).text();
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
-        const newList = doc.querySelector(".list-group");
-        const oldList = document.querySelector(".list-group");
-        if (newList && oldList) oldList.replaceWith(newList);
+        const newTable = doc.querySelector("#usersTable");
+        const oldTable = document.querySelector("#usersTable");
+        if (newTable && oldTable) oldTable.replaceWith(newTable);
     }
+
     document.getElementById("editUserModal").addEventListener("hidden.bs.modal", function () {
-    const flashContainer = document.getElementById("edit-flash-container");
-    flashContainer.innerHTML = "";
-});
+        const flashContainer = document.getElementById("edit-flash-container");
+        flashContainer.innerHTML = "";
+    });
 });
 </script>

@@ -1,7 +1,7 @@
 import uuid
 from flask import Blueprint, request, render_template, flash, jsonify, get_flashed_messages
 from flask_security import hash_password, current_user
-from core.utils import admin_required
+from core.utils import admin_required, login_required
 from models import User, db, Role
 
 admin = Blueprint('admin', __name__)
@@ -122,7 +122,7 @@ def edit_user():
     return jsonify({'success': True, 'messages': get_flashed_messages(with_categories=True)})
 
 @admin.route('/admin/get_user/<string:user_id>')
-@admin_required
+@login_required
 def get_user(user_id):
     user = User.query.filter_by(id=user_id).first()
     if user:

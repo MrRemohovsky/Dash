@@ -9,40 +9,51 @@
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createUserModal">Создать пользователя</button>
     </div>
 
-    <div class="list-group">
-    {% for user in pagination.items %}
-        <div class="list-group-item bg-dark text-white border-secondary rounded mb-2 d-flex justify-content-between align-items-center">
-            <div>
-                <strong>ФИО:</strong> {{ user.last_name }} {{ user.first_name }} {{ user.patronym }} |
-                <strong>Email:</strong> {{ user.email }} |
-                <strong>Роли:</strong>
-                {% for role in user.roles %}
-                    {{ role.description }}{% if not loop.last %}, {% endif %}
-                {% endfor %}
-            </div>
-            <div class="d-flex align-items-center">
-                <button
-                    class="btn btn-sm ms-2"
-                    style="background: none; border: none; color: inherit;"
-                    data-user-id="{{ user.id }}"
-                    data-first-name="{{ user.first_name }}"
-                    data-last-name="{{ user.last_name }}"
-                    data-patronym="{{ user.patronym }}"
-                    data-email="{{ user.email }}"
-                    onclick="openEditModal(this)"
-                >✏️</button>
+    <div class="table-responsive">
+        <table id="usersTable" class="table table-dark table-hover table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>ФИО</th>
+                    <th>Email</th>
+                    <th>Роли</th>
+                    <th class="text-center">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in pagination.items %}
+                    <tr>
+                        <td>{{ user.last_name }} {{ user.first_name }} {{ user.patronym }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% for role in user.roles %}
+                                {{ role.description }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td class="text-center">
+                            <button
+                                class="btn btn-sm"
+                                style="background: none; border: none; color: inherit;"
+                                data-user-id="{{ user.id }}"
+                                data-first-name="{{ user.first_name }}"
+                                data-last-name="{{ user.last_name }}"
+                                data-patronym="{{ user.patronym }}"
+                                data-email="{{ user.email }}"
+                                onclick="openEditModal(this)"
+                            >✏️</button>
 
-                {% if user.active %}
-                    <button
-                        class="btn btn-sm btn-outline-danger ms-2"
-                        data-user-id="{{ user.id }}"
-                        data-user-name="{{ user.first_name }} {{ user.last_name }}"
-                        onclick="confirmDeactivate(this)"
-                    >✖</button>
-                {% endif %}
-            </div>
-        </div>
-    {% endfor %}
+                            {% if user.active %}
+                                <button
+                                    class="btn btn-sm btn-outline-danger ms-2"
+                                    data-user-id="{{ user.id }}"
+                                    data-user-name="{{ user.first_name }} {{ user.last_name }}"
+                                    onclick="confirmDeactivate(this)"
+                                >✖</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
     {% if pagination.pages > 1 %}
@@ -77,6 +88,7 @@
         </nav>
     {% endif %}
 </div>
+
 {% include "modals/create_user_modal.html" %}
 {% include "scripts/create_validation.html" %}
 

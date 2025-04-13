@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const fullName = `${user.last_name} ${user.first_name} ${user.patronym || ''}`.trim();
         const roles = user.roles.map(role => role.description).join(', ');
-        const infoText = `Вы зашли как ${fullName} (${roles})`;
+        const infoText = `Вы ${fullName} (${roles})`;
         document.getElementById("user-info").textContent = infoText;
     } catch (error) {
         console.error("Ошибка при загрузке информации о пользователе:", error);

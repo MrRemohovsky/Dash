@@ -12,12 +12,11 @@ def index():
     return redirect('/login')
 
 @session.route('/load')
-@login_required
 def load():
     from app import app
 
     load_data(app)
-    return 'РАБОТА С БД'
+    return 'LOAD DATA'
 
 
 @session.route('/login', methods=['GET', 'POST'])
