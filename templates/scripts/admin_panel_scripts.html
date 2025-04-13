@@ -95,3 +95,61 @@ function openEditModal(user) {
     modal.show();
 }
 </script>
+
+<script>
+async function openEditModal(button) {
+    const userId = button.getAttribute("data-user-id");
+
+    const response = await fetch(`/admin/get_user/${userId}`);
+    const user = await response.json();
+
+    document.getElementById('edit_user_id').value = user.id;
+    document.getElementById('edit_first_name').value = user.first_name;
+    document.getElementById('edit_last_name').value = user.last_name;
+    document.getElementById('edit_patronym').value = user.patronym || '';
+    document.getElementById('edit_email').value = user.email;
+
+    const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+    modal.show();
+}
+document.getElementById("editUserForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+
+    const response = await fetch(form.action, {
+        method: "POST",
+        body: formData
+    });
+
+    const result = await response.json();
+
+    const flashContainer = document.getElementById("edit-flash-container");
+    flashContainer.innerHTML = "";
+
+    if (result.messages && result.messages.length > 0) {
+        const [category, message] = result.messages[result.messages.length - 1];
+        const alert = document.createElement("div");
+        alert.className = `alert alert-${category} alert-dismissible fade show shadow mt-2`;
+        alert.role = "alert";
+        alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+        `;
+        flashContainer.appendChild(alert);
+    }
+
+    if (result.success) {
+        const html = await (await fetch("{{ url_for('admin.get_all_users') }}")).text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const newList = doc.querySelector(".list-group");
+        const oldList = document.querySelector(".list-group");
+        if (newList && oldList) oldList.replaceWith(newList);
+    }
+    document.getElementById("editUserModal").addEventListener("hidden.bs.modal", function () {
+    const flashContainer = document.getElementById("edit-flash-container");
+    flashContainer.innerHTML = "";
+});
+});
+</script>

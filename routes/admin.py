@@ -69,3 +69,47 @@ def deactivate_user(user_id):
     user.active = False
     db.session.commit()
     return jsonify(success=True)
+
+@admin.route('/admin_panel/edit', methods=['POST'])
+@login_required
+def edit_user():
+    user_id = request.form.get('user_id')
+    first_name = request.form.get('first_name')
+    last_name = request.form.get('last_name')
+    patronym = request.form.get('patronym')
+    email = request.form.get('email')
+
+    if not all([user_id, first_name, last_name, patronym, email]):
+        flash('Заполните все поля.', 'warning')
+        return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)})
+
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        flash('Пользователь не найден.', 'danger')
+        return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)})
+
+    if User.query.filter(User.email == email, User.id != user_id).first():
+        flash('Пользователь с таким email уже существует.', 'danger')
+        return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)})
+
+    user.first_name = first_name
+    user.last_name = last_name
+    user.patronym = patronym
+    user.email = email
+    db.session.commit()
+
+    flash('Данные пользователя обновлены.', 'success')
+    return jsonify({'success': True, 'messages': get_flashed_messages(with_categories=True)})
+
+@admin.route('/admin/get_user/<string:user_id>')
+@login_required
+def get_user(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if user:
+        return jsonify({
+            "id": user.id,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "patronym": user.patronym,
+            "email": user.email
+        })
