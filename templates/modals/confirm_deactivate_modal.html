@@ -1,0 +1,18 @@
+<!-- Модалка подтверждения деактивации -->
+<div class="modal fade" id="confirmDeactivateModal" tabindex="-1" aria-labelledby="confirmDeactivateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white border-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeactivateModalLabel">Подтверждение</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                Вы действительно хотите деактивировать пользователя <strong id="deactivateUserName"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmDeactivateBtn">Да, деактивировать</button>
+            </div>
+        </div>
+    </div>
+</div>
