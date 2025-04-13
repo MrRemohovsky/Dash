@@ -1,0 +1,29 @@
+<script>
+const EMAIL_REGEX = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+
+const editEmailInput = document.getElementById('edit_email');
+const editPasswordInput = document.getElementById('edit_password');
+const editForm = document.getElementById("editUserForm");
+
+const editEmailError = document.createElement('div');
+editEmailError.classList.add('error-message', 'text-danger', 'mt-1');
+editEmailInput.parentNode.insertBefore(editEmailError, editEmailInput.nextSibling);
+
+const editPasswordError = document.createElement('div');
+editPasswordError.classList.add('error-message', 'text-danger', 'mt-1');
+editPasswordInput.parentNode.insertBefore(editPasswordError, editPasswordInput.nextSibling);
+
+function validateEditForm() {
+    const isEmailValid = EMAIL_REGEX.test(editEmailInput.value.trim());
+    const passwordValue = editPasswordInput.value.trim();
+    const isPasswordValid = passwordValue === "" || passwordValue.length >= 8;
+
+    editEmailError.textContent = isEmailValid ? '' : 'Введите корректный email';
+    editPasswordError.textContent = isPasswordValid ? '' : 'Пароль должен быть не менее 8 символов';
+
+    return isEmailValid && isPasswordValid;
+}
+
+editEmailInput.addEventListener('input', validateEditForm);
+editPasswordInput.addEventListener('input', validateEditForm);
+</script>

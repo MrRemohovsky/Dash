@@ -28,5 +28,7 @@ init_dashboard(dash_app)
 app.register_blueprint(session)
 app.register_blueprint(dashboard)
 app.register_blueprint(admin)
+
+
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,6 +1,6 @@
 import uuid
 from flask import Blueprint, request, render_template, flash, redirect, url_for, jsonify, get_flashed_messages
-from flask_security import hash_password
+from flask_security import hash_password, current_user
 from core.utils import login_required
 from models import User, db
 
@@ -78,6 +78,7 @@ def edit_user():
     last_name = request.form.get('last_name')
     patronym = request.form.get('patronym')
     email = request.form.get('email')
+    password = request.form.get('password')
 
     if not all([user_id, first_name, last_name, patronym, email]):
         flash('Заполните все поля.', 'warning')
@@ -92,10 +93,15 @@ def edit_user():
         flash('Пользователь с таким email уже существует.', 'danger')
         return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)})
 
+    if user != current_user and any(role.name == 'admin' for role in user.roles):
+        flash('Вы не можете редактировать данного пользователя!', 'danger')
+        return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)})
+
     user.first_name = first_name
     user.last_name = last_name
     user.patronym = patronym
     user.email = email
+    user.password = hash_password(password)
     db.session.commit()
 
     flash('Данные пользователя обновлены.', 'success')
@@ -113,3 +119,5 @@ def get_user(user_id):
             "patronym": user.patronym,
             "email": user.email
         })
+    else:
+        return jsonify({})

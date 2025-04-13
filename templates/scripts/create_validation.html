@@ -1,0 +1,42 @@
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const EMAIL_REGEX = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const submitButton = document.querySelector('#createUserModal button[type="submit"]');
+
+    // Создаём элементы ошибок
+    const emailError = document.createElement('div');
+    emailError.classList.add('text-danger', 'small', 'mt-1');
+    emailInput.parentNode.insertBefore(emailError, emailInput.nextSibling);
+
+    const passwordError = document.createElement('div');
+    passwordError.classList.add('text-danger', 'small', 'mt-1');
+    passwordInput.parentNode.insertBefore(passwordError, passwordInput.nextSibling);
+
+    function validateForm() {
+        const isEmailValid = EMAIL_REGEX.test(emailInput.value.trim());
+        const isPasswordValid = passwordInput.value.trim().length >= 8;
+
+        emailError.textContent = isEmailValid ? '' : 'Введите корректный email';
+        passwordError.textContent = isPasswordValid ? '' : 'Пароль должен быть не менее 8 символов';
+
+        submitButton.disabled = !(isEmailValid && isPasswordValid);
+    }
+
+    emailInput.addEventListener('input', validateForm);
+    passwordInput.addEventListener('input', validateForm);
+
+    const createUserModal = document.getElementById('createUserModal');
+    createUserModal.addEventListener('show.bs.modal', () => {
+        emailError.textContent = '';
+        passwordError.textContent = '';
+        emailInput.value = '';
+        passwordInput.value = '';
+        submitButton.disabled = true;
+    });
+
+    validateForm();
+});
+</script>

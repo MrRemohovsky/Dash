@@ -7,6 +7,7 @@
                     <h5 class="modal-title" id="editUserModalLabel">Редактирование пользователя</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
+
                 <div class="modal-body">
                     <div id="edit-flash-container" class="position-relative"></div>
                     <input type="hidden" id="edit_user_id" name="user_id">
@@ -25,6 +26,10 @@
                     <div class="mb-3">
                         <label for="edit_email" class="form-label">Почта</label>
                         <input type="email" class="form-control" id="edit_email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_password" class="form-label">Новый пароль</label>
+                        <input type="password" class="form-control" id="edit_password" name="password" placeholder="Оставьте пустым, чтобы не менять" minlength="8">
                     </div>
                 </div>
                 <div class="modal-footer">

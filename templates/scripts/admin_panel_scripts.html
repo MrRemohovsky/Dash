@@ -84,6 +84,7 @@ document.querySelector("#createUserModal form").addEventListener("submit", async
         if (newList && oldList) oldList.replaceWith(newList);
     }
 });
+
 function openEditModal(user) {
     document.getElementById('edit_user_id').value = user.id;
     document.getElementById('edit_first_name').value = user.first_name;
@@ -114,6 +115,7 @@ async function openEditModal(button) {
 }
 document.getElementById("editUserForm").addEventListener("submit", async function (e) {
     e.preventDefault();
+    if (!validateEditForm()) return;
     const form = e.target;
     const formData = new FormData(form);
 
