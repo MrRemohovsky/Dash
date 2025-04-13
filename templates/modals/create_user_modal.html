@@ -29,6 +29,11 @@
                         <label for="password" class="form-label">Пароль</label>
                         <input type="password" class="form-control" id="password" name="password" required minlength="8">
                     </div>
+                    <div class="mb-3">
+                        <label for="roles" class="form-label">Роли</label>
+                        <select multiple class="form-select" id="roles" name="roles" style="width: 100%">
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Создать</button>
@@ -37,3 +42,44 @@
         </div>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    $('#createUserModal').on('show.bs.modal', async function () {
+        const $rolesSelect = $('#roles');
+
+        if ($rolesSelect.children().length === 0) {
+            try {
+                const response = await fetch("{{ url_for('admin.get_roles') }}");
+                const roles = await response.json();
+
+                $rolesSelect.empty();
+
+                roles.forEach(role => {
+                    const option = new Option(role.name, role.id, false, false);
+                    $rolesSelect.append(option);
+                });
+
+                if (!$rolesSelect.hasClass("select2-hidden-accessible")) {
+                    $rolesSelect.select2({
+                        placeholder: "Выберите роли",
+                        allowClear: true,
+                        width: '100%',
+                        dropdownParent: $('#createUserModal')
+                    });
+                }
+
+            } catch (error) {
+                console.error("Ошибка загрузки ролей:", error);
+            }
+        }
+    });
+});
+</script>

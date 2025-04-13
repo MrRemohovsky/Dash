@@ -19,12 +19,33 @@
                     </li>
                 {% endif %}
                 <li class="nav-item">
+                    <span id="user-info" class="nav-link disabled text-light">Загрузка...</span>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="/logout">Выход</a>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    try {
+        const response = await fetch("{{ url_for('admin.get_user', user_id=current_user.id) }}");
+        const user = await response.json();
+
+        const fullName = `${user.last_name} ${user.first_name} ${user.patronym || ''}`.trim();
+        const roles = user.roles.map(role => role.description).join(', ');
+        const infoText = `Вы зашли как ${fullName} (${roles})`;
+        document.getElementById("user-info").textContent = infoText;
+    } catch (error) {
+        console.error("Ошибка при загрузке информации о пользователе:", error);
+        document.getElementById("user-info").textContent = "Ошибка загрузки пользователя";
+    }
+});
+</script>
+
+
 {% endif %}
 
 <style>
