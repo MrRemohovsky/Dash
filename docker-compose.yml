@@ -1,0 +1,48 @@
+services:
+  web:
+    container_name: backend
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - MAIN_DATABASE_URL=postgresql://postgres:postgres@dash_db:5432/dash_db
+      - MONITORING_DATABASE_URL=postgresql://postgres:postgres@monitoring_db:5432/monitoring_data
+      - SECRET_KEY=f1a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6y7z8
+      - SECURITY_PASSWORD_SALT=f7a9b3e2d8c541f0b6e9d2c8a7f3e5b9
+    depends_on:
+      - dash_db
+      - monitoring_db
+    volumes:
+      - .:/app
+
+  dash_db:
+    container_name: dash_db
+    image: postgres:17
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=dash_db
+    volumes:
+      - dash_db_data:/var/lib/postgresql/data
+      - ./dash_db.sql:/docker-entrypoint-initdb.d/dash_db.sql
+    ports:
+      - "5433:5432"
+
+  monitoring_db:
+    container_name: monitoring_db
+    image: postgres:17
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=monitoring_data
+    volumes:
+      - monitoring_data_data:/var/lib/postgresql/data
+      - ./monitoring_db.sql:/docker-entrypoint-initdb.d/monitoring_db.sql
+    ports:
+      - "5434:5432"
+
+volumes:
+  dash_db_data:
+  monitoring_data_data:
