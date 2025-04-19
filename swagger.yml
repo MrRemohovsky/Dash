@@ -1,0 +1,143 @@
+swagger: "2.0"
+info:
+  title: Admin API
+  description: API для управления пользователями и ролями в админ-панели
+  version: "1.0"
+basePath: /
+schemes:
+  - http
+consumes:
+  - application/x-www-form-urlencoded
+produces:
+  - application/json
+
+paths:
+
+  /admin_panel/create:
+    post:
+      tags:
+        - Users
+      summary: Создание пользователя
+      parameters:
+        - name: first_name
+          in: formData
+          required: true
+          type: string
+        - name: last_name
+          in: formData
+          required: true
+          type: string
+        - name: patronym
+          in: formData
+          required: true
+          type: string
+        - name: email
+          in: formData
+          required: true
+          type: string
+        - name: password
+          in: formData
+          required: true
+          type: string
+        - name: roles
+          in: formData
+          required: false
+          type: array
+          items:
+            type: string
+      responses:
+        200:
+          description: Пользователь успешно создан
+        400:
+          description: Не заполнены обязательные поля
+        401:
+          description: Email уже используется
+
+  /admin_panel/edit:
+    post:
+      tags:
+        - Users
+      summary: Редактирование пользователя
+      parameters:
+        - name: user_id
+          in: formData
+          required: true
+          type: string
+        - name: first_name
+          in: formData
+          required: true
+          type: string
+        - name: last_name
+          in: formData
+          required: true
+          type: string
+        - name: patronym
+          in: formData
+          required: true
+          type: string
+        - name: email
+          in: formData
+          required: true
+          type: string
+        - name: password
+          in: formData
+          required: false
+          type: string
+        - name: roles
+          in: formData
+          required: false
+          type: array
+          items:
+            type: string
+      responses:
+        200:
+          description: Данные обновлены
+        400:
+          description: Не все поля заполнены
+        401:
+          description: Email уже используется
+        403:
+          description: Недостаточно прав
+        404:
+          description: Пользователь не найден
+
+  /admin_panel/deactivate/{user_id}:
+    post:
+      tags:
+        - Users
+      summary: Деактивация пользователя
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Пользователь деактивирован
+        404:
+          description: Пользователь не найден
+
+  /admin/get_user/{user_id}:
+    get:
+      tags:
+        - Users
+      summary: Получить пользователя по ID
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Данные пользователя
+        404:
+          description: Пользователь не найден
+
+  /get_roles:
+    get:
+      tags:
+        - Roles
+      summary: Получить список всех ролей
+      responses:
+        200:
+          description: Список ролей

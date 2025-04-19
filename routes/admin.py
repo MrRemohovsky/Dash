@@ -24,6 +24,13 @@ def create_user():
     password = request.form['password']
     role_ids = request.form.getlist('roles')
 
+    if User.query.filter_by(email=email).first():
+        flash('Пользователь с таким email уже существует.', 'warning')
+        return jsonify({
+            'success': False,
+            'messages': get_flashed_messages(with_categories=True)
+        }), 401
+
     if all([first_name, last_name, patronym, email, password]):
         new_user = User(
             id=str(uuid.uuid4())[:4],
@@ -48,13 +55,6 @@ def create_user():
             'messages': get_flashed_messages(with_categories=True)
         }), 200
 
-    if User.query.filter_by(email=email).first():
-        flash('Пользователь с таким email уже существует.', 'warning')
-        return jsonify({
-            'success': False,
-            'messages': get_flashed_messages(with_categories=True)
-        }), 401
-
     flash('Заполните все поля.', 'danger')
     return jsonify({
         'success': False,
@@ -68,10 +68,10 @@ def deactivate_user(user_id):
     user = User.query.filter_by(id=user_id).first()
 
     if not user:
-        return jsonify(success=False, message='Пользователь не найден.')
+        return jsonify(success=False, message='Пользователь не найден.'), 404
 
     if any(role.name.lower() == 'admin' for role in user.roles):
-        return jsonify(success=False, message='Нельзя деактивировать администратора.')
+        return jsonify(success=False, message='Нельзя деактивировать администратора.'), 403
 
     user.active = False
     db.session.commit()

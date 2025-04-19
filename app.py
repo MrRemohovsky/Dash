@@ -9,10 +9,12 @@ from core.config import Config
 from core.db_parser import init_db, db
 from flask_security import Security, SQLAlchemyUserDatastore
 from models import User, Role
-
+from flasgger import Swagger
 app = Flask(__name__, static_folder=os.path.join(os.getcwd(), 'templates'))
 app.config.from_object(Config)
 init_db(app)
+
+swagger = Swagger(app, template_file='swagger.yml')
 
 migrate = Migrate(app, db)
 
