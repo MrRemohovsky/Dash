@@ -1,4 +1,3 @@
-<!-- Модалка редактирования пользователя -->
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content bg-dark text-white border-light">
@@ -51,7 +50,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const $rolesSelect = $('#edit_roles');
 
-    // Инициализация Select2
     $rolesSelect.select2({
         placeholder: "Выберите роли",
         allowClear: true,
@@ -69,12 +67,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            // Получение данных пользователя
             const userResponse = await fetch(`/admin/get_user/${userId}`);
             if (!userResponse.ok) throw new Error('Ошибка загрузки данных пользователя');
             const user = await userResponse.json();
 
-            // Установка значений в форму
             document.getElementById('edit_user_id').value = user.id;
             document.getElementById('edit_first_name').value = user.first_name;
             document.getElementById('edit_last_name').value = user.last_name;
@@ -82,10 +78,8 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('edit_email').value = user.email;
             document.getElementById('edit_password').value = '';
 
-            // Сохранение userId в data модалки
             $('#editUserModal').data('user-id', userId);
 
-            // Открытие модалки
             const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
             modal.show();
 
@@ -102,7 +96,6 @@ document.addEventListener("DOMContentLoaded", function () {
         $flashContainer.empty();
         $rolesSelect.empty();
 
-        // Получение userId из data модалки
         const userId = $(this).data('user-id');
         if (!userId) {
             $flashContainer.html(
@@ -112,23 +105,19 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            // Получение данных пользователя
             const userResponse = await fetch(`/admin/get_user/${userId}`);
             if (!userResponse.ok) throw new Error('Ошибка загрузки данных пользователя');
             const user = await userResponse.json();
 
-            // Получение всех ролей
             const rolesResponse = await fetch("{{ url_for('admin.get_roles') }}");
             if (!rolesResponse.ok) throw new Error('Ошибка загрузки ролей');
             const allRoles = await rolesResponse.json();
 
-            // Добавление всех опций в select
             allRoles.forEach(role => {
                 const option = new Option(role.name, role.id, false, false);
                 $rolesSelect.append(option);
             });
 
-            // Установка выбранных ролей
             const selectedRoleIds = user.roles.map(role => role.id.toString());
             $rolesSelect.val(selectedRoleIds).trigger('change');
 
@@ -140,14 +129,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Очистка Select2 при закрытии модального окна
     $('#editUserModal').on('hidden.bs.modal', function () {
         $rolesSelect.empty().trigger('change');
         $flashContainer.empty();
         $(this).removeData('user-id');
     });
 
-    // Экспортируем openEditModal для глобального доступа
     window.openEditModal = openEditModal;
 });
 </script>

@@ -10,9 +10,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/charts">Графики</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/load">Load</a>
-                </li>
                 {% if current_user.is_authenticated and current_user.roles == ['admin'] %}
                     <li class="nav-item">
                         <a class="nav-link" href="/admin_panel">Панель администратора</a>
