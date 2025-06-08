@@ -20,7 +20,7 @@
 
 ```bash
 git clone https://github.com/MrRemohovsky/Dash
-cd Dashboard
+cd Dash
 ```
 
 2. **Запустите сборку и приложение:**
