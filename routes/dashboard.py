@@ -15,7 +15,6 @@ def dash_page():
 @login_required
 def render_dash():
     from app import dash_app
-
     return dash_app.index()
 
 class DashboardApp:
@@ -33,8 +32,8 @@ class DashboardApp:
                     html.Label("Завод:", className="form-label selector-label"),
                     dcc.Dropdown(
                         id='factory-selector',
-                        options=[{'label': factory.title, 'value': factory.id} for factory in  self.factories],
-                        value=None,
+                        options=[{'label': factory.title, 'value': factory.id} for factory in self.factories],
+                        value=self.factories[0].id if self.factories else None,
                         placeholder="Выберите завод",
                         className="selector"
                     ),
@@ -55,7 +54,7 @@ class DashboardApp:
                         id='date-picker-range',
                         start_date="2025-03-20",
                         end_date="2025-03-22",
-                        display_format='YYYY-MM-DD',
+                        display_format='DD-MM-YYYY',
                         className="selector date-picker"
                     ),
                 ], className="selector-wrapper"),
@@ -63,16 +62,9 @@ class DashboardApp:
             html.Div(id='charts-container', className="row charts-container")
         ], className="container-fluid dash-background")
 
-    def _get_equipment_options(self, factory_id):
-        if not factory_id:
-            return []
-        with self.dash_app.server.app_context():
-            equipments = Equipment.query.filter_by(factory_id=factory_id).all()
-            return [{'label': equipment.title, 'value': equipment.id} for equipment in equipments]
-
     def _get_chart_elements(self, factory_id, equipment_id, start_date, end_date):
         if not factory_id or not equipment_id or not start_date or not end_date:
-            return [html.P("Выберите завод, устройство и диапазон дат для отображения графиков")]
+            return [html.P("Нет данных за выбранный промежуток времени")]
         chart_elements = []
         with self.dash_app.server.app_context():
             charts = Chart.query.join(Equipment).filter(
@@ -94,11 +86,17 @@ class DashboardApp:
 
     def _register_callbacks(self):
         @self.dash_app.callback(
-            Output('device-selector', 'options'),
+            [Output('device-selector', 'options'),  # Выводим опции
+             Output('device-selector', 'value')],  # Выводим значение для выбора первого
             Input('factory-selector', 'value')
         )
         def update_equipment_selector(factory_id):
-            return self._get_equipment_options(factory_id)
+            if not factory_id:
+                return [], None
+            with self.dash_app.server.app_context():
+                equipments = Equipment.query.filter_by(factory_id=factory_id).all()
+                options = [{'label': f'{equipment.title}-{equipment.position[-2:]}', 'value': equipment.id} for equipment in equipments]
+                return options, options[0]['value'] if options else None
 
         @self.dash_app.callback(
             Output('charts-container', 'children'),

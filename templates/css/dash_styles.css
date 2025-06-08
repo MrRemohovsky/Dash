@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
 .dash-background {
     background: linear-gradient(135deg, rgba(10, 10, 25, 1) 0%, rgba(30, 30, 50, 1) 100%);
     min-height: 100vh;
