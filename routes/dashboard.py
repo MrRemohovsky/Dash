@@ -68,7 +68,7 @@ class DashboardApp:
         from collections import defaultdict
 
         if not factory_id or not equipment_id or not start_date or not end_date:
-            return [html.P("Нет данных за выбранный промежуток времени")]
+            return [html.P("Нет данных за выбранный промежуток времени", className="text-center fw-bold mt-3")]
 
         chart_elements = []
         with self.dash_app.server.app_context():
@@ -81,7 +81,7 @@ class DashboardApp:
             ).all()
 
             if not charts:
-                return [html.P("Нет данных за выбранный промежуток времени")]
+                return [html.P("Нет данных за выбранный промежуток времени", className="text-center fw-bold mt-3")]
 
             chart_ids = [chart.id for chart in charts]
 
@@ -121,7 +121,7 @@ class DashboardApp:
                         )
                     )
 
-        return chart_elements if chart_elements else [html.P("Нет данных за выбранный промежуток времени")]
+        return chart_elements if chart_elements else [html.P("Нет данных за выбранный промежуток времени", className="text-center fw-bold mt-3")]
 
     def _register_callbacks(self):
         @self.dash_app.callback(
