@@ -5,8 +5,9 @@
 </head>
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link" href="/charts">Графики</a>
                 </li>
@@ -18,13 +19,18 @@
                 <li class="nav-item">
                     <span id="user-info" class="nav-link disabled text-light">Загрузка...</span>
                 </li>
+            </ul>
+
+            <ul class="navbar-nav mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link" href="/logout">Выход</a>
                 </li>
             </ul>
+
         </div>
     </div>
 </nav>
+
 <script>
 document.addEventListener("DOMContentLoaded", async function () {
     try {
@@ -33,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const fullName = `${user.last_name} ${user.first_name} ${user.patronym || ''}`.trim();
         const roles = user.roles.map(role => role.description).join(', ');
-        const infoText = `Вы ${fullName} (${roles})`;
+        const infoText = `Вы ${fullName}${roles ? ` (${roles})` : ''}`;
         document.getElementById("user-info").textContent = infoText;
     } catch (error) {
         console.error("Ошибка при загрузке информации о пользователе:", error);
