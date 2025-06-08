@@ -121,6 +121,9 @@ html, body {
     align-items: center;
     height: 32px;
     width: auto !important;
+    background-color: rgba(40, 40, 80, 0.9) !important;
+
+
 }
 
 .DateInput_input {
@@ -132,10 +135,13 @@ html, body {
     height: 32px;
     padding: 0 8px;
     text-shadow: 0 0 5px rgba(0, 234, 255, 0.5) !important;
+
 }
 
 .DateInput_input::placeholder {
     color: #00eaff !important;
+    background-color: rgba(40, 40, 80, 0.9) !important;
+
 }
 
 .DateRangePicker_picker {
@@ -145,6 +151,8 @@ html, body {
 
 .CalendarDay {
     color: #00eaff !important;
+    background-color: rgba(40, 40, 80, 0.9) !important;
+
 }
 
 .CalendarDay__selected {

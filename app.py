@@ -26,6 +26,7 @@ dash_app = Dash(__name__, server=app, url_base_pathname='/dashboard/', external_
     "/templates/css/dash_styles.css",
 ])
 
+
 init_dashboard(dash_app)
 app.register_blueprint(session)
 app.register_blueprint(dashboard)

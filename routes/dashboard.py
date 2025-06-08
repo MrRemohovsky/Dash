@@ -64,8 +64,6 @@ class DashboardApp:
             html.Div(id='charts-container', className="row charts-container")
         ], className="container-fluid dash-background")
 
-
-
     def _get_chart_elements(self, factory_id, equipment_id, start_date, end_date):
         from collections import defaultdict
 
@@ -127,8 +125,8 @@ class DashboardApp:
 
     def _register_callbacks(self):
         @self.dash_app.callback(
-            [Output('device-selector', 'options'),  # Выводим опции
-             Output('device-selector', 'value')],  # Выводим значение для выбора первого
+            [Output('device-selector', 'options'),
+             Output('device-selector', 'value')],
             Input('factory-selector', 'value')
         )
         def update_equipment_selector(factory_id):

@@ -54,7 +54,7 @@ class ChartTypeSelector:
                 ),
             "furnace_temperature":
                 px.scatter(
-                    df.iloc[::10],
+                    df,
                     x="timestamp",
                     y="value",
                     title=title,
