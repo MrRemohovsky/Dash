@@ -1,7 +1,9 @@
+import pandas as pd
 from dash import html, dcc, Output, Input
+from sqlalchemy import text
 from core.utils import login_required
 from services.chart_service import ChartService
-from models import Factory, Equipment, Chart
+from models import Factory, Equipment, Chart, db
 from flask import render_template, Blueprint
 
 dashboard = Blueprint('dashboard', __name__)
@@ -15,7 +17,6 @@ def dash_page():
 @login_required
 def render_dash():
     from app import dash_app
-
     return dash_app.index()
 
 class DashboardApp:
@@ -33,8 +34,8 @@ class DashboardApp:
                     html.Label("Завод:", className="form-label selector-label"),
                     dcc.Dropdown(
                         id='factory-selector',
-                        options=[{'label': factory.title, 'value': factory.id} for factory in  self.factories],
-                        value=None,
+                        options=[{'label': factory.title, 'value': factory.id} for factory in self.factories],
+                        value=self.factories[0].id if self.factories else None,
                         placeholder="Выберите завод",
                         className="selector"
                     ),
@@ -53,9 +54,9 @@ class DashboardApp:
                     html.Label("Диапазон дат:", className="form-label selector-label date-label"),
                     dcc.DatePickerRange(
                         id='date-picker-range',
-                        start_date="2025-03-20",
+                        start_date="2025-03-21",
                         end_date="2025-03-22",
-                        display_format='YYYY-MM-DD',
+                        display_format='DD-MM-YYYY',
                         className="selector date-picker"
                     ),
                 ], className="selector-wrapper"),
@@ -63,42 +64,78 @@ class DashboardApp:
             html.Div(id='charts-container', className="row charts-container")
         ], className="container-fluid dash-background")
 
-    def _get_equipment_options(self, factory_id):
-        if not factory_id:
-            return []
-        with self.dash_app.server.app_context():
-            equipments = Equipment.query.filter_by(factory_id=factory_id).all()
-            return [{'label': equipment.title, 'value': equipment.id} for equipment in equipments]
-
     def _get_chart_elements(self, factory_id, equipment_id, start_date, end_date):
+        from collections import defaultdict
+
         if not factory_id or not equipment_id or not start_date or not end_date:
-            return [html.P("Выберите завод, устройство и диапазон дат для отображения графиков")]
+            return [html.P("Нет данных за выбранный промежуток времени", className="text-center fw-bold mt-3")]
+
         chart_elements = []
         with self.dash_app.server.app_context():
+            start = pd.to_datetime(start_date.replace("Z", "+00:00")).tz_localize(None)
+            end = pd.to_datetime(end_date.replace("Z", "+00:00")).tz_localize(None)
+
             charts = Chart.query.join(Equipment).filter(
                 Chart.equipment_id == equipment_id,
                 Equipment.factory_id == factory_id
-            ).all() if factory_id and equipment_id else []
+            ).all()
+
+            if not charts:
+                return [html.P("Нет данных за выбранный промежуток времени", className="text-center fw-bold mt-3")]
+
+            chart_ids = [chart.id for chart in charts]
+
+            sql = text("""
+                SELECT chart.id, elem
+                FROM chart,
+                     jsonb_array_elements(chart.time_series) AS elem
+                WHERE chart.id = ANY(:ids)
+                  AND (elem->>'timestamp')::timestamp >= :start
+                  AND (elem->>'timestamp')::timestamp <= :end
+            """)
+
+            results = db.session.execute(sql, {
+                'ids': chart_ids,
+                'start': start,
+                'end': end
+            }).fetchall()
+
+            data_by_chart = defaultdict(list)
+            for chart_id, elem in results:
+                data_by_chart[chart_id].append(elem)
 
             for chart in charts:
-                filtered_time_series = ChartService.filter_chart(chart.time_series, start_date, end_date)
-                if filtered_time_series:
-                    fig = ChartService.build_chart(filtered_time_series, chart.title, chart.sensor_type, chart.unit)
+                filtered_data = data_by_chart.get(chart.id, [])
+                if filtered_data:
+                    fig = ChartService.build_chart(filtered_data, chart.title, chart.sensor_type, chart.unit)
                     chart_elements.append(
                         html.Div(
-                            dcc.Graph(figure=fig, style={'height': '300px'}),
+                            dcc.Graph(figure=fig, config={'responsive': True},
+                                      style={
+                                          'height': '300px',
+                                          'maxWidth': '1000px',
+                                          'margin': 'auto',
+                                          'aspectRatio': '4 / 1'
+                                      }),
                             className="col-md-6 mb-2"
                         )
                     )
-        return chart_elements if chart_elements else None
+
+        return chart_elements if chart_elements else [html.P("Нет данных за выбранный промежуток времени", className="text-center fw-bold mt-3")]
 
     def _register_callbacks(self):
         @self.dash_app.callback(
-            Output('device-selector', 'options'),
+            [Output('device-selector', 'options'),
+             Output('device-selector', 'value')],
             Input('factory-selector', 'value')
         )
         def update_equipment_selector(factory_id):
-            return self._get_equipment_options(factory_id)
+            if not factory_id:
+                return [], None
+            with self.dash_app.server.app_context():
+                equipments = Equipment.query.filter_by(factory_id=factory_id).all()
+                options = [{'label': f'{equipment.title}-{equipment.position[-2:]}', 'value': equipment.id} for equipment in equipments]
+                return options, options[0]['value'] if options else None
 
         @self.dash_app.callback(
             Output('charts-container', 'children'),

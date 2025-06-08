@@ -86,7 +86,8 @@ def load_data(app):
                 sensor_data = monitoring_session.query(SensorData).filter(SensorData.sensor_id == sensor.sensor_id).order_by('timestamp').all()
                 time_series = [
                     {"timestamp": str(data.timestamp), "value": data.value}
-                    for data in sensor_data
+                    for i, data in enumerate(sensor_data)
+                    if i % 10 == 0
                 ]
 
                 if not Chart.query.filter_by(id=sensor.sensor_id, equipment_id=sensor.equipment_id).first():

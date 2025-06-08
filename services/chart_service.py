@@ -1,30 +1,80 @@
-import numpy as np
 import plotly.express as px
 import pandas as pd
-from datetime import datetime
-
 
 class ChartTypeSelector:
-    def __init__(self, title):
+    def __init__(self, title, df, unit):
         self.title = title
+        self.df = df
+        self.unit = unit
         self.dict_chart_types = {
-            "mixer_engine_temperature": px.line,
-            "mixer_current_consumption": px.scatter,
-            "mixer_vibration": px.box,
-            "mixer_rotation_speed": px.violin,
-            "belt_movement_speed": px.line,
-            "conveyor_current_consumption": px.histogram,
-            "conveyor_vibration": px.strip,
-            "conveyor_motor_temperature": px.ecdf,
-            "furnace_temperature": px.density_contour,
-            "furnace_current_consumption": px.density_heatmap,
-            "cooling_temperature": px.scatter,
-            "airflow_speed": px.histogram
+            "mixer_engine_temperature":
+                px.density_heatmap(
+                df,
+                x="timestamp",
+                y="value",
+                title=title,
+                labels={"timestamp": "Time", "value": f"{unit}"},
+                color_continuous_scale="Viridis",
+                ),
+            "mixer_current_consumption":
+                px.scatter(
+                    df,
+                    x="timestamp",
+                    y="value",
+                    title=title,
+                    labels={"timestamp": "Time", "value": f"{unit}"},
+                    color='value',
+                ),
+            "mixer_vibration":
+                px.histogram(
+                    df,
+                    x="timestamp",
+                    y="value",
+                    title=title,
+                    labels={"timestamp": "Time", "value": f"{unit}"},
+                    color_discrete_sequence=['purple'],
+                ).update_layout(bargap=0.1),
+            "conveyor_vibration":
+                px.histogram(
+                    df,
+                    x="timestamp",
+                    y="value",
+                    title=title,
+                    labels={"timestamp": "Time", "value": f"{unit}"},
+                    color_discrete_sequence=['green'],
+                ).update_layout(bargap=0.1),
+            "conveyor_motor_temperature":
+                px.density_heatmap(
+                df,
+                x="timestamp",
+                y="value",
+                title=title,
+                labels={"timestamp": "Time", "value": f"{unit}"},
+                color_continuous_scale="Spectral",
+                ),
+            "furnace_temperature":
+                px.scatter(
+                    df,
+                    x="timestamp",
+                    y="value",
+                    title=title,
+                    labels={"timestamp": "Time", "value": f"{unit}"},
+                    color_continuous_scale="Viridis",
+                ).update_traces(marker=dict(size=10))
         }
 
-    def get_chart_type(self):
-        return self.dict_chart_types.get(self.title, px.line)
-
+    def get_chart_info(self):
+        return self.dict_chart_types.get(
+            self.title,
+            px.line(
+                self.df,
+                x="timestamp",
+                y="value",
+                title=self.title,
+                labels={"timestamp": "Time", "value": f"{self.unit}"},
+                color_discrete_sequence=['black']
+            ),
+        )
 
 class ChartService:
     @staticmethod
@@ -32,41 +82,13 @@ class ChartService:
         df = pd.DataFrame(time_series)
         df['timestamp'] = pd.to_datetime(df['timestamp'])
 
-        #graph = ChartTypeSelector(title).get_chart_type()
-        fig = px.line(df, x='timestamp', y='value', title=title, labels={"timestamp": "Time", "value": f"value {unit}"})
-        # if graph in [px.density_heatmap, px.density_contour]:
-        #     fig = graph(
-        #         df,
-        #         x="timestamp",
-        #         y="value",
-        #         title=title,
-        #         labels={"timestamp": "Time", "value": f"value {unit}"}
-        #     )
-        # elif graph == px.ecdf:
-        #     fig = graph(
-        #         df,
-        #         x="value",
-        #         title=title,
-        #         labels={"value": f"value {unit}"}
-        #     )
-        # else:
-        #     fig = graph(
-        #         df,
-        #         x="timestamp",
-        #         y="value",
-        #         title=title,
-        #         labels={"timestamp": "Time", "value": f"value {unit}"}
-        #     )
+        fig = ChartTypeSelector(title, df, unit).get_chart_info()
+
+        fig.update_layout(
+            margin=dict(l=10, r=10, t=50, b=10),
+            plot_bgcolor='rgba(245, 245, 220, 1)',
+            paper_bgcolor='rgba(47, 79, 79, 1)',
+            font_color='white'
+        )
 
         return fig
-
-    @staticmethod
-    def filter_chart(time_series, start_date, end_date):
-        start = pd.to_datetime(start_date.replace("Z", "+00:00"))
-        end = pd.to_datetime(end_date.replace("Z", "+00:00"))
-
-        df = pd.DataFrame(time_series)
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
-        filtered_df = df[(df['timestamp'] >= start) & (df['timestamp'] <= end)]
-
-        return filtered_df.to_dict('records')

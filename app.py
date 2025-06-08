@@ -9,10 +9,12 @@ from core.config import Config
 from core.db_parser import init_db, db
 from flask_security import Security, SQLAlchemyUserDatastore
 from models import User, Role
-
+from flasgger import Swagger
 app = Flask(__name__, static_folder=os.path.join(os.getcwd(), 'templates'))
 app.config.from_object(Config)
 init_db(app)
+
+swagger = Swagger(app, template_file='swagger.yml')
 
 migrate = Migrate(app, db)
 
@@ -24,6 +26,7 @@ dash_app = Dash(__name__, server=app, url_base_pathname='/dashboard/', external_
     "/templates/css/dash_styles.css",
 ])
 
+
 init_dashboard(dash_app)
 app.register_blueprint(session)
 app.register_blueprint(dashboard)
@@ -31,4 +34,4 @@ app.register_blueprint(admin)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

@@ -29,7 +29,7 @@ def create_user():
         return jsonify({
             'success': False,
             'messages': get_flashed_messages(with_categories=True)
-        })
+        }), 401
 
     if all([first_name, last_name, patronym, email, password]):
         new_user = User(
@@ -53,13 +53,13 @@ def create_user():
         return jsonify({
             'success': True,
             'messages': get_flashed_messages(with_categories=True)
-        })
+        }), 200
 
     flash('Заполните все поля.', 'danger')
     return jsonify({
         'success': False,
         'messages': get_flashed_messages(with_categories=True)
-    })
+    }), 400
 
 
 @admin.route('/admin_panel/deactivate/<string:user_id>', methods=['POST'])
@@ -68,14 +68,14 @@ def deactivate_user(user_id):
     user = User.query.filter_by(id=user_id).first()
 
     if not user:
-        return jsonify(success=False, message='Пользователь не найден.')
+        return jsonify(success=False, message='Пользователь не найден.'), 404
 
     if any(role.name.lower() == 'admin' for role in user.roles):
-        return jsonify(success=False, message='Нельзя деактивировать администратора.')
+        return jsonify(success=False, message='Нельзя деактивировать администратора.'), 403
 
     user.active = False
     db.session.commit()
-    return jsonify(success=True)
+    return jsonify(success=True), 200
 
 @admin.route('/admin_panel/edit', methods=['POST'])
 @admin_required
@@ -90,20 +90,20 @@ def edit_user():
 
     if not all([user_id, first_name, last_name, patronym, email]):
         flash('Заполните все поля.', 'warning')
-        return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)})
+        return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)}), 400
 
     user = User.query.filter_by(id=user_id).first()
     if not user:
         flash('Пользователь не найден.', 'danger')
-        return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)})
+        return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)}), 404
 
     if User.query.filter(User.email == email, User.id != user_id).first():
         flash('Пользователь с таким email уже существует.', 'danger')
-        return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)})
+        return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)}), 401
 
     if user != current_user and any(role.name == 'admin' for role in user.roles):
         flash('Вы не можете редактировать данного пользователя!', 'danger')
-        return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)})
+        return jsonify({'success': False, 'messages': get_flashed_messages(with_categories=True)}), 403
 
     if role_ids:
         roles = Role.query.filter(Role.id.in_(role_ids)).all()
@@ -119,7 +119,7 @@ def edit_user():
     db.session.commit()
 
     flash('Данные пользователя обновлены.', 'success')
-    return jsonify({'success': True, 'messages': get_flashed_messages(with_categories=True)})
+    return jsonify({'success': True, 'messages': get_flashed_messages(with_categories=True)}), 200
 
 @admin.route('/admin/get_user/<string:user_id>')
 @login_required
@@ -133,10 +133,12 @@ def get_user(user_id):
             "patronym": user.patronym,
             "email": user.email,
             'roles': [{'id': role.id, 'name': role.name, 'description': role.description} for role in user.roles]
-        })
+        }), 200
+    else:
+        return jsonify({'success': False, 'messages': 'Пользователь не найден'}), 404
 
 @admin.route('/get_roles')
 @admin_required
 def get_roles():
     roles = Role.query.all()
-    return jsonify([{'id': r.id, 'name': r.name} for r in roles])
+    return jsonify([{'id': r.id, 'name': r.name} for r in roles]), 200
