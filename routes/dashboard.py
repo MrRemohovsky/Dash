@@ -54,7 +54,7 @@ class DashboardApp:
                     html.Label("Диапазон дат:", className="form-label selector-label date-label"),
                     dcc.DatePickerRange(
                         id='date-picker-range',
-                        start_date="2025-03-20",
+                        start_date="2025-03-21",
                         end_date="2025-03-22",
                         display_format='DD-MM-YYYY',
                         className="selector date-picker"
@@ -112,7 +112,13 @@ class DashboardApp:
                     fig = ChartService.build_chart(filtered_data, chart.title, chart.sensor_type, chart.unit)
                     chart_elements.append(
                         html.Div(
-                            dcc.Graph(figure=fig, style={'height': '300px'}),
+                            dcc.Graph(figure=fig, config={'responsive': True},
+                                      style={
+                                          'height': '300px',
+                                          'maxWidth': '1000px',
+                                          'margin': 'auto',
+                                          'aspectRatio': '4 / 1'
+                                      }),
                             className="col-md-6 mb-2"
                         )
                     )

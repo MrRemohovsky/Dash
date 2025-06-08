@@ -2,6 +2,8 @@ import uuid
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import UserMixin, RoleMixin
+from sqlalchemy import Index
+from sqlalchemy.dialects.postgresql import JSONB
 
 db = SQLAlchemy()
 
@@ -28,7 +30,7 @@ class Chart(db.Model):
     __tablename__ = "chart"
     id = db.Column(db.String(4), primary_key=True)
     title = db.Column(db.String(255), nullable=False)
-    time_series = db.Column(db.JSON, nullable=False)
+    time_series = db.Column(JSONB, nullable=False)
     sensor_type = db.Column(db.String(255), nullable=False)
     unit = db.Column(db.String(10), nullable=False)
     equipment_id = db.Column(db.String(4), db.ForeignKey("equipment.id"), nullable=False)
@@ -68,3 +70,5 @@ class Role(db.Model, RoleMixin):
 
     def __repr__(self):
         return f"<Role {self.name}>"
+
+Index('ix_chart_time_series_gin', Chart.time_series, postgresql_using='gin')
